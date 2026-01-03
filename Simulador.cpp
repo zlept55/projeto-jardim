@@ -53,6 +53,8 @@ Jardim* Simulador::clonarJardim(const Jardim* origem) {
     return copia;
 }
 
+#include "Ferramenta.h"
+
 Simulador::Simulador(Jardim* j, Jardineiro* jard) {
     instanteAtual = 0;
     jardim = j;
@@ -63,6 +65,7 @@ Simulador::~Simulador() {
     delete jardim;
     for (auto& par : backups)
         delete par.second;
+    delete jardim; // se o jardim existir, é libertado da memória
 }
 
 int Simulador::getInstanteAtual() const {
@@ -81,6 +84,14 @@ void Simulador::avanca(int nInstantes) {
 
     for (int i = 0; i < nInstantes; i++) {
         instanteAtual++;
+    for (int i = 0; i < nInstantes; i++) {
+        instanteAtual++;
+
+        jardim->atualizar();
+
+
+
+        std::cout << "[DEBUG] Instante " << instanteAtual << " concluído\n";
         jardim->avancaInstante();   // avanço interno do jardim (plantas, etc.)
         std::cout << "[DEBUG] Instante " << instanteAtual << " concluido\n";
     }
@@ -173,7 +184,6 @@ void Simulador::processarComando(const Comando& cmd) {
         jardim->mostrar(*jardineiro);
         return;
     }
-
     // comando planta <l><c> <tipo>
     if (nome == "planta") {
         if (!jardim) {

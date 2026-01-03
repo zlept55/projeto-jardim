@@ -84,3 +84,17 @@ class Settings {
 };
 
 #endif // SETTINGS_H
+    class Carnivora {
+        public:
+        static const int agua_inicial = 10;
+        static const int nutrientes_inicial = 40;
+        static const int perda_agua = 1;
+        static const int perda_nutrientes = 3;
+        static const int absorcao_agua = 1;
+        static const int absorcao_nutrientes = 10;
+        static const int morre_agua_menor = 1;
+        static const int morre_nutrientes_menor = 5;
+        static const int morre_nutrientes_maior = 199;
+        static const int multiplica_nutrientes_maior = 120;
+        static const int ganha_nutrientes_feia = 20;
+    };

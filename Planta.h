@@ -6,6 +6,8 @@
 #include "Bloco.h"
 #include "Settings.h"
 #include "Settings.h"
+#include "Settings.h"
+#include "Settings.h"
 
 
 class Planta {
@@ -44,6 +46,16 @@ public:
     void limparPedidos();
 
     virtual void morrer(Bloco& b) = 0;
+    virtual void morrer(Bloco& b) = 0;
+    virtual void mostrarInfo() const;
+
+    virtual void aposMultiplicacao() {}
+
+    bool querMult() const { return pedirMult; }
+    void resetMult() { pedirMult = false; }
+
+    char getSimbolo() const { return simbolo; }
+
 };
 
 // === Classes derivadas ===
@@ -68,6 +80,7 @@ public:
     Roseira() : Planta("Roseira", 'r', Settings::Roseira::agua_inicial, Settings::Roseira::nutrientes_inicial) {}
     void atualizar(Bloco& b) override;
     void morrer(Bloco& b);
+    void aposMultiplicacao() override;
     Planta* clonar() const override;
     void mostrarInfo() const override {
         std::cout << "[Roseira] água=" << agua << ", nutrientes=" << nutrientes << "\n";
@@ -110,5 +123,17 @@ public:
 };
 
 
+
+class Carnivora : public Planta {
+public:
+    Carnivora() : Planta("Planta Carnivora", 'k', Settings::Carnivora::agua_inicial, Settings::Carnivora::nutrientes_inicial) {}
+    void atualizar(Bloco& b) override;
+    Planta* clonar() const override;
+    void ganhaNutrientes(int quantidade) { nutrientes += quantidade; }
+    void morrer(Bloco& b);
+    void mostrarInfo() const override {
+        std::cout << "[Carnivora] água=" << agua << ", nutrientes=" << nutrientes << "\n";
+    }
+};
 
 #endif //TP_PLANTA_H

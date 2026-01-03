@@ -15,6 +15,8 @@ Bloco::~Bloco() {
 }
 
 void Bloco::defValoresIniciais() {
+    agua = Settings::agua_inicial_solo_min +
+           rand() % (Settings::agua_inicial_solo_max - Settings::agua_inicial_solo_min + 1);
     // Valores iniciais aleatórios com base no enunciado:
     // água entre 80 e 100, nutrientes entre 40 e 50 (usando Settings ou rand). [file:1][file:42]
     int minAgua = Settings::agua_inicial_solo_min;

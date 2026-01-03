@@ -102,6 +102,11 @@ void Roseira::morrer(Bloco& b) {
     nutrientes = 0;
 }
 
+void Roseira::aposMultiplicacao() {
+    agua /= 2;          // metade da água fica na mãe
+    nutrientes = 100;   // regra do enunciado
+}
+
 void ErvaDaninha::atualizar(Bloco& b) {
     if (!viva)
         return;
@@ -146,26 +151,18 @@ void ErvaDaninha::morrer(Bloco& b) {
 
 } */
 
-void Exotica::atualizar(Bloco& b) {
+void Carnivora::atualizar(Bloco& b) {
     if (!viva)
         return;
 
-    bool comeu = false;
+    agua -= Settings::Carnivora::perda_agua;
+    nutrientes -= Settings::Carnivora::perda_nutrientes;
 
-    // Tenta comer outra planta no mesmo bloco (simplificacao)
-    Planta* outra = b.getPlanta();
-    if (outra && outra != this) {
-        nutrientes += Settings::Exotica::bonus_comida;
-        outra->morrer(b);
-        comeu = true;
-    }
-
-    // Absorve um pouco do solo
     int aguaSolo = b.getAgua();
     int nutrientesSolo = b.getNutrientes();
 
-    int absorcaoAgua = std::min(Settings::Exotica::absorcao_agua, aguaSolo);
-    int absorcaoNutrientes = std::min(Settings::Exotica::absorcao_nutrientes, nutrientesSolo);
+    int absorcaoAgua = std::min(Settings::Carnivora::absorcao_agua,aguaSolo);
+    int absorcaoNutrientes = std::min(Settings::Carnivora::absorcao_nutrientes,nutrientesSolo);
 
     agua += absorcaoAgua;
     nutrientes += absorcaoNutrientes;
@@ -173,24 +170,34 @@ void Exotica::atualizar(Bloco& b) {
     b.setAgua(aguaSolo - absorcaoAgua);
     b.setNutrientes(nutrientesSolo - absorcaoNutrientes);
 
-    // Fome
-    if (comeu)
-        instantesSemComer = 0;
-    else
-        instantesSemComer++;
-
-    if (instantesSemComer >= Settings::Exotica::morre_fome_instantes) {
+    if (agua < Settings::Carnivora::morre_agua_menor ||
+        nutrientes < Settings::Carnivora::morre_nutrientes_menor ||
+        nutrientes > Settings::Carnivora::morre_nutrientes_maior) {
         morrer(b);
         return;
-    }
+        }
+
+    if (nutrientes > Settings::Carnivora::morre_nutrientes_maior)
+        pedirMult = true;
 }
 
-void Exotica::morrer(Bloco& b) {
+Planta *Carnivora::clonar() const {
+    Carnivora* k = new Carnivora();
+    k->agua = Settings::Carnivora::agua_inicial;
+    k->nutrientes = Settings::Roseira::nutrientes_inicial;
+    return k;
+}
+
+void Carnivora::morrer(Bloco &b) {
     viva = false;
-    b.setNutrientes(b.getNutrientes() + nutrientes / 2);
+
+    b.setAgua(b.getAgua() + agua);
+    b.setNutrientes(b.getNutrientes() + nutrientes);
+
     agua = 0;
     nutrientes = 0;
 }
+
 // Implementações mínimas das funções virtuais puras de Planta
 Planta::~Planta() {}  // Destrutor virtual
 
@@ -205,4 +212,39 @@ void Planta::morrerBloco(Bloco &b) {
 
 void Planta::atualizarBloco(Bloco &b) {
     // Comportamento padrão vazio
+    if (agua < Settings::Carnivora::morre_agua_menor ||
+        nutrientes < Settings::Carnivora::morre_nutrientes_menor ||
+        nutrientes > Settings::Carnivora::morre_nutrientes_maior) {
+        morrer(b);
+        return;
+    }
+
+    if (nutrientes > Settings::Carnivora::morre_nutrientes_maior)
+        pedirMult = true;
+}
+
+Planta *Carnivora::clonar() const {
+    Carnivora* k = new Carnivora();
+    k->agua = Settings::Carnivora::agua_inicial;
+    k->nutrientes = Settings::Roseira::nutrientes_inicial;
+    return k;
+}
+
+void Carnivora::morrer(Bloco &b) {
+    viva = false;
+
+    b.setAgua(b.getAgua() + agua);
+    b.setNutrientes(b.getNutrientes() + nutrientes);
+
+    agua = 0;
+    nutrientes = 0;
+}
+
+
+void Planta::mostrarInfo() const {
+    std::cout << nome
+              << " | Água = " << agua
+              << " | Nutrientes = " << nutrientes
+              << " | Viva = " << (viva ? "Sim" : "Não")
+              << "\n";
 }

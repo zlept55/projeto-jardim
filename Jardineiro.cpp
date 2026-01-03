@@ -3,7 +3,10 @@
 #include "Bloco.h"
 
 #include <algorithm>
+<<<<<<< HEAD
 #include <iostream>
+=======
+>>>>>>> d11f45bdbc12db95a50e2d92f0a551621fd9302a
 
 Jardineiro::Jardineiro() {
     noJardim = false;
@@ -27,13 +30,17 @@ void Jardineiro::entra(int l, int c) {
     noJardim = true;
     linha = l;
     coluna = c;
+<<<<<<< HEAD
     registarEntradaSaida();
+=======
+>>>>>>> d11f45bdbc12db95a50e2d92f0a551621fd9302a
 }
 
 void Jardineiro::sai() {
     noJardim = false;
     linha = -1;
     coluna = -1;
+<<<<<<< HEAD
     registarEntradaSaida();
 }
 
@@ -128,6 +135,28 @@ void Jardineiro::registarPlantacao() {
 
 void Jardineiro::registarColheita() {
     plantasColhidas++;
+=======
+}
+
+void Jardineiro::paraCima() {
+    if (noJardim)
+        linha--;
+}
+
+void Jardineiro::paraBaixo() {
+    if (noJardim)
+        linha++;
+}
+
+void Jardineiro::paraEsquerda() {
+    if (noJardim)
+        coluna--;
+}
+
+void Jardineiro::paraDireita() {
+    if (noJardim)
+        coluna++;
+>>>>>>> d11f45bdbc12db95a50e2d92f0a551621fd9302a
 }
 
 // --- gestão de ferramentas ---
@@ -211,6 +240,7 @@ void Jardineiro::aplicarFerramentaAtual(Jardim& jardim) {
         naMao->usar();
     }
 }
+<<<<<<< HEAD
 
 // --- listagem de ferramentas ---
 
@@ -234,3 +264,5 @@ void Jardineiro::listarFerramentas() const {
     if (!naMao)
         std::cout << "Nenhuma ferramenta na mao.\n";
 }
+=======
+>>>>>>> d11f45bdbc12db95a50e2d92f0a551621fd9302a

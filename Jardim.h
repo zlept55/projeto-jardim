@@ -31,6 +31,14 @@ public:
     int getInstante() const;
 
     void avancaInstante();
+
+    int getLinhas() const {return linhas;}
+    int getColunas() const {return colunas;}
+    int getInstante() const;
+
+    void avancaInstante();
+    bool querMult() const;
+
     void atualizar();
 
     void multiplicarRoseiras(int l, int c);
@@ -40,7 +48,6 @@ public:
     Bloco* getBloco(int linha, int coluna) const;
     void mostrar(const Jardineiro& j) const;
 
-    // --- meta 2 ---
     void adicionarPlanta(int l, int c, Planta* p);
     void adicionarFerramenta(int l, int c, Ferramenta* f);
 };

@@ -19,6 +19,8 @@ bool Comando::validar() {
     std::vector<std::string> comandosValidos = {
         "jardim", "avanca", "planta", "colhe", "fim",
         "compra", "entra", "sai", "c", "b", "e", "d", "usa"  // novo comando para comprar ferramentas
+
+        "compra"   // novo comando para comprar ferramentas
     };
 
     bool valido = false;

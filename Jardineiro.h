@@ -33,10 +33,17 @@ public:
 
     void entra(int l, int c);
     void sai();
+
     void paraCima(int maxLinhas);
     void paraBaixo(int maxLinhas);
     void paraEsquerda(int maxColunas);
     void paraDireita(int maxColunas);
+
+    void paraCima();
+    void paraBaixo();
+    void paraEsquerda();
+    void paraDireita();
+
 
     // Gestão de ferramentas
     void apanharFerramenta(Ferramenta* f); // adiciona ao inventário
@@ -45,6 +52,7 @@ public:
 
     // Aplicar a ferramenta atual na posição onde o jardineiro está
     void aplicarFerramentaAtual(Jardim& jardim);
+
 
     // --- gestão de contadores de turno ---
     void resetTurno();
