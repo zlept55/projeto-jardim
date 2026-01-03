@@ -1,34 +1,44 @@
 #include <iostream>
-#include <ctime>
+#include <string>
+
 #include "Simulador.h"
 #include "Comando.h"
+#include "Jardim.h"
+#include "Jardineiro.h"
 
 int main() {
     Jardim* jardim = nullptr;
     Jardineiro* jardineiro = new Jardineiro();
-    std::srand(time(nullptr)); // inicializa os números aleatórios
-
-    std::cout << "=== Simulador de Jardim ===\n";
 
     Simulador sim(jardim, jardineiro);
+
     std::string linha;
+
+    std::cout << "Simulador de Jardim (POO)\n";
+    std::cout << "Escreva comandos (fim para sair).\n";
 
     while (true) {
         std::cout << "> ";
-        std::getline(std::cin, linha);
+        if (!std::getline(std::cin, linha))
+            break;
+
+        if (linha.empty())
+            continue;
 
         Comando cmd(linha);
-
         if (!cmd.validar())
             continue;
 
-        if (cmd.getNome() == "fim")
+        if (cmd.getNome() == "fim") {
+            sim.processarComando(cmd);
             break;
+        }
 
         sim.processarComando(cmd);
     }
 
-    std::cout << "Programa terminado.\n";
     delete jardineiro;
+    // jardim é destruído no destrutor de Simulador
+
     return 0;
 }

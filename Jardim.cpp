@@ -1,19 +1,23 @@
 #include <iostream>
+#include <stdexcept>
 #include <cstdlib>
-#include <ctime>
 
 #include "Jardim.h"
 #include "Ferramenta.h"
 #include "Planta.h"
 #include "Jardineiro.h"
 
-Jardim::Jardim(int l, int c) : linhas(l), colunas(c) {
+Jardim::Jardim(int l, int c) : linhas(l), colunas(c), jardineiro(nullptr), instanteAtual(0) {
     if (linhas <= 0 || colunas <= 0)
         throw std::invalid_argument("Dimensoes invalidas do jardim");
-    grelha = new Bloco*[linhas];
 
+    grelha = new Bloco*[linhas];
     for (int i = 0; i < linhas; i++)
         grelha[i] = new Bloco[colunas];
+}
+
+void Jardim::setJardineiro(Jardineiro* j) {
+    jardineiro = j;
 }
 
 Jardim::~Jardim() {
@@ -31,10 +35,13 @@ int Jardim::getColunas() const {
     return colunas;
 }
 
+int Jardim::getInstante() const {
+    return instanteAtual;
+}
+
 Bloco* Jardim::getBloco(int l, int c) const {
     if (l < 0 || l >= linhas || c < 0 || c >= colunas)
         return nullptr;
-
     return &grelha[l][c];
 }
 
@@ -54,27 +61,30 @@ void Jardim::atualizar() {
 
 void Jardim::avancaInstante() {
     instanteAtual++;
-    atualizar();
+
+    atualizar(); // plantas
+
+    // se existir jardineiro, aplica a ferramenta que estiver na mão
+    if (jardineiro) {
+        jardineiro->aplicarFerramentaAtual(*this);
+    }
+
     verificarEspacoRoseiras();
 }
-
 
 void Jardim::tratarMultiplicacao() {
     for (int l = 0; l < linhas; l++) {
         for (int c = 0; c < colunas; c++) {
-
             Planta* p = grelha[l][c].getPlanta();
             if (!p || !p->querMult())
                 continue;
 
             for (int dl = -1; dl <= 1; dl++) {
                 for (int dc = -1; dc <= 1; dc++) {
-
                     if (dl == 0 && dc == 0) continue;
 
                     int nl = l + dl;
                     int nc = c + dc;
-
                     if (!posicaoValida(nl, nc)) continue;
                     if (grelha[nl][nc].getPlanta()) continue;
 
@@ -91,6 +101,7 @@ void Jardim::tratarMultiplicacao() {
                     return;
                 }
             }
+
             p->resetMult();
         }
     }
@@ -104,18 +115,15 @@ void Jardim::mostrar(const Jardineiro& j) const {
     std::cout << "\n";
 
     for (int l = 0; l < linhas; l++) {
-
         std::cout << char('A' + l) << " ";
-
         for (int c = 0; c < colunas; c++) {
             const Bloco& b = grelha[l][c];
 
             if (j.estaNoJardim() &&
                 j.getLinha() == l &&
                 j.getColuna() == c) {
-
                 std::cout << "*";
-                }
+            }
             else if (b.getPlanta() != nullptr) {
                 std::cout << b.getPlanta()->getSimbolo();
             }
@@ -126,7 +134,6 @@ void Jardim::mostrar(const Jardineiro& j) const {
                 std::cout << " ";
             }
         }
-
         std::cout << " " << char('A' + l) << "\n";
     }
 
@@ -139,27 +146,22 @@ void Jardim::mostrar(const Jardineiro& j) const {
 
 void Jardim::multiplicarRoseira(int l, int c) {
     Planta* p = grelha[l][c].getPlanta();
-
     if (!p || p->getSimbolo() != 'r')
         return;
 
     for (int dl = -1; dl <= 1; dl++) {
         for (int dc = -1; dc <= 1; dc++) {
-
             if (dl == 0 && dc == 0)
                 continue;
 
             int nl = l + dl;
             int nc = c + dc;
-
             if (!posicaoValida(nl,nc))
                 continue;
 
             if (grelha[nl][nc].getPlanta() == nullptr) {
-
                 Planta* nova = p->clonar();
                 grelha[nl][nc].setPlanta(nova);
-
                 p->resetMult();
                 return;
             }
@@ -167,12 +169,32 @@ void Jardim::multiplicarRoseira(int l, int c) {
     }
 }
 
+bool Jardim::roseiraSemEspaco(int l, int c) const {
+    Planta* p = grelha[l][c].getPlanta();
+    if (!p || p->getSimbolo() != 'r')
+        return false;
+
+    for (int dl = -1; dl <= 1; dl++) {
+        for (int dc = -1; dc <= 1; dc++) {
+            if (dl == 0 && dc == 0)
+                continue;
+
+            int nl = l + dl;
+            int nc = c + dc;
+            if (!posicaoValida(nl, nc))
+                continue;
+
+            if (grelha[nl][nc].getPlanta() == nullptr)
+                return false;
+        }
+    }
+    return true;
+}
+
 void Jardim::verificarEspacoRoseiras() {
     for (int l = 0; l < linhas; l++) {
         for (int c = 0; c < colunas; c++) {
-
             Planta* p = grelha[l][c].getPlanta();
-
             if (p && p->getSimbolo() == 'r') {
                 if (roseiraSemEspaco(l, c)) {
                     p->morrer(grelha[l][c]);
@@ -182,16 +204,32 @@ void Jardim::verificarEspacoRoseiras() {
     }
 }
 
-// --- Funções planeadas (meta 2) ---
-/*
+// --- meta 2 ---
+
 void Jardim::adicionarPlanta(int l, int c, Planta* p) {
-    // TODO: validar limites e se já existe planta
-    std::cout << "TODO: adicionar planta em (" << l << "," << c << ")\n";
+    if (!posicaoValida(l, c) || p == nullptr)
+        return;
+
+    Bloco* b = getBloco(l, c);
+    if (!b)
+        return;
+
+    if (b->getPlanta() != nullptr)
+        return; // já existe planta nessa posição
+
+    b->setPlanta(p);
 }
 
 void Jardim::adicionarFerramenta(int l, int c, Ferramenta* f) {
-    // TODO: validar limites e se já existe ferramenta
-    std::cout << "TODO: adicionar ferramenta em (" << l << "," << c << ")\n";
-}
+    if (!posicaoValida(l, c) || f == nullptr)
+        return;
 
-*/
+    Bloco* b = getBloco(l, c);
+    if (!b)
+        return;
+
+    if (b->getFerramenta() != nullptr)
+        return; // já existe ferramenta nessa posição
+
+    b->setFerramenta(f);
+}

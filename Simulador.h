@@ -6,6 +6,7 @@
 #include "Jardineiro.h"
 
 class Simulador {
+
 private:
     Jardim* jardim;
     int instanteAtual;
@@ -16,8 +17,8 @@ public:
     ~Simulador();
 
     int getInstanteAtual() const;
-    void avanca(int nInstantes);
 
+    void avanca(int nInstantes);
     void processarComando(const Comando& cmd);
 };
 
