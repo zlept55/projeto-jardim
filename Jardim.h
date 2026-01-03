@@ -23,12 +23,12 @@ public:
 
     void setJardineiro(Jardineiro* j);
 
-    int getLinhas() const;
-    int getColunas() const;
+    int getLinhas() const {return linhas;}
+    int getColunas() const {return colunas;}
     int getInstante() const;
 
     void avancaInstante();
-    bool querMult() const { return pedirMult; }
+    bool querMult() const;
     void multiplicarRoseiras(int l, int c);
     bool roseiraSemEspaco(int l, int c) const;
     void multiplicarRoseira(int l, int c);

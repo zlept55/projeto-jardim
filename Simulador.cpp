@@ -22,11 +22,7 @@ void Simulador::avanca(int nInstantes) {
 
         jardim->atualizar();
 
-        // FUTURO:
-        // 1. jardim->atualizar();
-        // 2. plantas crescem/morrem
-        // 3. ferramentas desgastam
-        // 4. limites do jardineiro resetam
+
 
         std::cout << "[DEBUG] Instante " << instanteAtual << " concluído\n";
     }

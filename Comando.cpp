@@ -15,7 +15,6 @@ bool Comando::validar() {
         return false;
     }
 
-    // Comandos válidos nesta fase (meta 1)
     std::vector<std::string> comandosValidos = {
         "jardim", "avanca", "planta", "colhe", "fim"
     };

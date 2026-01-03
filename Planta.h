@@ -6,6 +6,8 @@
 #include "Bloco.h"
 #include "Settings.h"
 #include "Settings.h"
+#include "Settings.h"
+#include "Settings.h"
 
 
 class Planta {
@@ -17,7 +19,6 @@ protected:
 
     bool viva = true;
     bool pedirMult = false;
-    bool pedirMorte = false;
 
 public:
     Planta(std::string nome, char simbolo, int agua, int nutrientes)
@@ -27,23 +28,16 @@ public:
 
     virtual Planta* clonar() const = 0;
     virtual void atualizar(Bloco& b) = 0;
+    virtual void morrer(Bloco& b) = 0;
     virtual void mostrarInfo() const;
-    virtual char getSimbolo() const { return simbolo; }
 
+    virtual void aposMultiplicacao() {}
 
     bool querMult() const { return pedirMult; }
-    void resetMult() {pedirMult = false;}
-    bool estaViva() const { return viva; }
+    void resetMult() { pedirMult = false; }
 
-    int getAgua() const { return agua; }
-    int getNutrientes() const { return nutrientes; }
+    char getSimbolo() const { return simbolo; }
 
-    void setAgua(int a) {agua = a;}
-    void setNutrientes(int n) {nutrientes = n;}
-
-    void limparPedidos();
-
-    virtual void morrer(Bloco& b) = 0;
 };
 
 // === Classes derivadas ===
@@ -68,6 +62,7 @@ public:
     Roseira() : Planta("Roseira", 'r', Settings::Roseira::agua_inicial, Settings::Roseira::nutrientes_inicial) {}
     void atualizar(Bloco& b) override;
     void morrer(Bloco& b);
+    void aposMultiplicacao() override;
     Planta* clonar() const override;
     void mostrarInfo() const override {
         std::cout << "[Roseira] água=" << agua << ", nutrientes=" << nutrientes << "\n";
@@ -88,12 +83,15 @@ public:
     }
 };
 
-class Exotica : public Planta {
+class Carnivora : public Planta {
 public:
-    Exotica() : Planta("Exótica", 'x', 10, 10) {}
-    //void atualizar() override { /* TODO: comportamento da planta exótica */ }
+    Carnivora() : Planta("Planta Carnivora", 'k', Settings::Carnivora::agua_inicial, Settings::Carnivora::nutrientes_inicial) {}
+    void atualizar(Bloco& b) override;
+    Planta* clonar() const override;
+    void ganhaNutrientes(int quantidade) { nutrientes += quantidade; }
+    void morrer(Bloco& b);
     void mostrarInfo() const override {
-        std::cout << "[Exótica] água=" << agua << ", nutrientes=" << nutrientes << "\n";
+        std::cout << "[Carnivora] água=" << agua << ", nutrientes=" << nutrientes << "\n";
     }
 };
 
