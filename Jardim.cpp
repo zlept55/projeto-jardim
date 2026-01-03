@@ -1,44 +1,184 @@
-#include "Jardim.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 
-Jardim::Jardim(int l, int c) : linhas(l), colunas(c) {
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
+#include "Jardim.h"
+#include "Ferramenta.h"
+#include "Planta.h"
+#include "Jardineiro.h"
 
-    // criar matriz de ponteiros
-    grelha = new Bloco**[linhas];
-    for (int i = 0; i < linhas; ++i) {
-        grelha[i] = new Bloco*[colunas];
-        for (int j = 0; j < colunas; ++j) {
-            int aguaInicial = std::rand() % 21 + 80;        // 80–100
-            int nutrientesIniciais = std::rand() % 11 + 40; // 40–50
-            grelha[i][j] = new Bloco(aguaInicial, nutrientesIniciais);
-        }
-    }
+Jardim::Jardim(int l, int c) : linhas(l), colunas(c) {
+    if (linhas <= 0 || colunas <= 0)
+        throw std::invalid_argument("Dimensoes invalidas do jardim");
+    grelha = new Bloco*[linhas];
+
+    for (int i = 0; i < linhas; i++)
+        grelha[i] = new Bloco[colunas];
 }
 
 Jardim::~Jardim() {
-    // libertar cada Bloco e as linhas
-    for (int i = 0; i < linhas; ++i) {
-        for (int j = 0; j < colunas; ++j)
-            delete grelha[i][j];
+    for (int i = 0; i < linhas; i++) {
         delete[] grelha[i];
     }
     delete[] grelha;
 }
 
-void Jardim::mostrar() const {
+int Jardim::getLinhas() const {
+    return linhas;
+}
+
+int Jardim::getColunas() const {
+    return colunas;
+}
+
+Bloco* Jardim::getBloco(int l, int c) const {
+    if (l < 0 || l >= linhas || c < 0 || c >= colunas)
+        return nullptr;
+
+    return &grelha[l][c];
+}
+
+bool Jardim::posicaoValida(int l, int c) const {
+    return l >= 0 && l < linhas && c >= 0 && c < colunas;
+}
+
+void Jardim::atualizar() {
+    for (int l = 0; l < linhas; l++)
+        for (int c = 0; c < colunas; c++)
+            if (grelha[l][c].getPlanta())
+                grelha[l][c].getPlanta()->atualizar(grelha[l][c]);
+
+    tratarMultiplicacao();
+    verificarEspacoRoseiras();
+}
+
+void Jardim::avancaInstante() {
+    instanteAtual++;
+    atualizar();
+    verificarEspacoRoseiras();
+}
+
+
+void Jardim::tratarMultiplicacao() {
+    for (int l = 0; l < linhas; l++) {
+        for (int c = 0; c < colunas; c++) {
+
+            Planta* p = grelha[l][c].getPlanta();
+            if (!p || !p->querMult())
+                continue;
+
+            for (int dl = -1; dl <= 1; dl++) {
+                for (int dc = -1; dc <= 1; dc++) {
+
+                    if (dl == 0 && dc == 0) continue;
+
+                    int nl = l + dl;
+                    int nc = c + dc;
+
+                    if (!posicaoValida(nl, nc)) continue;
+                    if (grelha[nl][nc].getPlanta()) continue;
+
+                    // Criar nova planta
+                    grelha[nl][nc].setPlanta(p->clonar());
+
+                    // Ajustes específicos da roseira
+                    if (p->getSimbolo() == 'r') {
+                        p->setAgua(p->getAgua() / 2);
+                        p->setNutrientes(100);
+                    }
+
+                    p->resetMult();
+                    return;
+                }
+            }
+            p->resetMult();
+        }
+    }
+}
+
+void Jardim::mostrar(const Jardineiro& j) const {
     std::cout << "  ";
-    for (int j = 0; j < colunas; ++j)
-        std::cout << static_cast<char>('A' + j);
+    for (int c = 0; c < colunas; c++) {
+        std::cout << char('A' + c);
+    }
     std::cout << "\n";
 
-    for (int i = 0; i < linhas; ++i) {
-        std::cout << static_cast<char>('A' + i) << " ";
-        for (int j = 0; j < colunas; ++j)
-            std::cout << grelha[i][j]->getSimbolo();
-        std::cout << "\n";
+    for (int l = 0; l < linhas; l++) {
+
+        std::cout << char('A' + l) << " ";
+
+        for (int c = 0; c < colunas; c++) {
+            const Bloco& b = grelha[l][c];
+
+            if (j.estaNoJardim() &&
+                j.getLinha() == l &&
+                j.getColuna() == c) {
+
+                std::cout << "*";
+                }
+            else if (b.getPlanta() != nullptr) {
+                std::cout << b.getPlanta()->getSimbolo();
+            }
+            else if (b.getFerramenta() != nullptr) {
+                std::cout << b.getFerramenta()->getSimbolo();
+            }
+            else {
+                std::cout << " ";
+            }
+        }
+
+        std::cout << " " << char('A' + l) << "\n";
+    }
+
+    std::cout << "  ";
+    for (int c = 0; c < colunas; c++) {
+        std::cout << char('A' + c);
+    }
+    std::cout << "\n";
+}
+
+void Jardim::multiplicarRoseira(int l, int c) {
+    Planta* p = grelha[l][c].getPlanta();
+
+    if (!p || p->getSimbolo() != 'r')
+        return;
+
+    for (int dl = -1; dl <= 1; dl++) {
+        for (int dc = -1; dc <= 1; dc++) {
+
+            if (dl == 0 && dc == 0)
+                continue;
+
+            int nl = l + dl;
+            int nc = c + dc;
+
+            if (!posicaoValida(nl,nc))
+                continue;
+
+            if (grelha[nl][nc].getPlanta() == nullptr) {
+
+                Planta* nova = p->clonar();
+                grelha[nl][nc].setPlanta(nova);
+
+                p->resetMult();
+                return;
+            }
+        }
+    }
+}
+
+void Jardim::verificarEspacoRoseiras() {
+    for (int l = 0; l < linhas; l++) {
+        for (int c = 0; c < colunas; c++) {
+
+            Planta* p = grelha[l][c].getPlanta();
+
+            if (p && p->getSimbolo() == 'r') {
+                if (roseiraSemEspaco(l, c)) {
+                    p->morrer(grelha[l][c]);
+                }
+            }
+        }
     }
 }
 
@@ -54,7 +194,4 @@ void Jardim::adicionarFerramenta(int l, int c, Ferramenta* f) {
     std::cout << "TODO: adicionar ferramenta em (" << l << "," << c << ")\n";
 }
 
-Bloco* Jardim::getBloco(int l, int c) const {
-    // TODO: validar limites
-    return &grelha[l][c];
-}*/
+*/

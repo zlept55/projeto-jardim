@@ -4,11 +4,13 @@
 #include "Comando.h"
 
 int main() {
+    Jardim* jardim = nullptr;
+    Jardineiro* jardineiro = new Jardineiro();
     std::srand(time(nullptr)); // inicializa os números aleatórios
 
     std::cout << "=== Simulador de Jardim ===\n";
 
-    Simulador sim;
+    Simulador sim(jardim, jardineiro);
     std::string linha;
 
     while (true) {
@@ -27,5 +29,6 @@ int main() {
     }
 
     std::cout << "Programa terminado.\n";
+    delete jardineiro;
     return 0;
 }

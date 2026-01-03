@@ -2,9 +2,36 @@
 #include <iostream>
 #include <cstdlib>
 
+Simulador::Simulador(Jardim* j, Jardineiro* jard) {
+    instanteAtual = 0;
+    jardim = j;
+    jardineiro = jard;
+}
+
 Simulador::~Simulador() {
     delete jardim;  // se o jardim existir, é libertado da memória
 }
+
+int Simulador::getInstanteAtual() const{
+    return instanteAtual;
+}
+
+void Simulador::avanca(int nInstantes) {
+    for (int i = 0; i < nInstantes; i++) {
+        instanteAtual++;
+
+        jardim->atualizar();
+
+        // FUTURO:
+        // 1. jardim->atualizar();
+        // 2. plantas crescem/morrem
+        // 3. ferramentas desgastam
+        // 4. limites do jardineiro resetam
+
+        std::cout << "[DEBUG] Instante " << instanteAtual << " concluído\n";
+    }
+}
+
 
 void Simulador::processarComando(const Comando& cmd) {
     std::string nome = cmd.getNome();
@@ -30,7 +57,7 @@ void Simulador::processarComando(const Comando& cmd) {
 
         std::cout << "\nJardim criado com sucesso ("
                   << linhas << "x" << colunas << ")\n";
-        jardim->mostrar(); // mostra o jardim criado
+        jardim->mostrar(*jardineiro); // mostra o jardim criado
         return;
     }
 

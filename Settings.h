@@ -3,6 +3,11 @@
 
 class Settings {
     public:
+        static const int agua_inicial_solo_min = 80;
+        static const int agua_inicial_solo_max = 100;
+        static const int nutrientes_inicial_solo_min = 40;
+        static const int nutrientes_inicial_solo_max = 50;
+
     class Jardim {
     public:
         static const int agua_min = 80;
@@ -40,8 +45,8 @@ class Settings {
     };
     class Roseira {
         public:
-        static const int inicial_agua = 25;
-        static const int inicial_nutrientes = 25;
+        static const int agua_inicial = 25;
+        static const int nutrientes_inicial = 25;
         static const int perda_agua = 4;
         static const int perda_nutrientes = 4;
         static const int absorcao_agua = 5;
@@ -57,8 +62,8 @@ class Settings {
     };
     class ErvaDaninha {
         public:
-        static const int inicial_agua = 5;
-        static const int inicial_nutrientes = 5;
+        static const int agua_inicial = 5;
+        static const int nutrientes_inicial = 5;
         static const int absorcao_agua = 1;
         static const int absorcao_nutrientes = 1;
         static const int morre_instantes = 60;

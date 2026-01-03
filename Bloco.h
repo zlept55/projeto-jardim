@@ -13,6 +13,7 @@ class Bloco {
     int nutrientes; // quantidade de nutrientes no bloco atual
 
 public:
+    Bloco();
     Bloco(int agua, int nutrientes) : agua(agua), nutrientes(nutrientes){};
     ~Bloco();
     void defValoresIniciais(); // TODO: funcao que define os valores iniciais (aleatórios) de água e nutrientes
@@ -31,7 +32,6 @@ public:
     void setAgua(int a) { agua = a; }
     void setNutrientes(int n) { nutrientes = n; }
 
-    // TODO: comportamento futuro
     void atualizar(); // chamada a cada instante (planta/ferramenta podem agir)
 };
 

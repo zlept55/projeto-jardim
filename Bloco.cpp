@@ -1,8 +1,14 @@
 #include "Bloco.h"
 #include "Planta.h"
+#include "Settings.h"
 #include "Ferramenta.h"
 #include <iostream>
 #include <cstdlib>
+
+
+Bloco::Bloco() {
+    defValoresIniciais();
+}
 
 // destrutor — liberta memória se existirem planta ou ferramenta
 Bloco::~Bloco() {
@@ -13,8 +19,14 @@ Bloco::~Bloco() {
 // define valores iniciais de água e nutrientes (aleatórios)
 void Bloco::defValoresIniciais() {
     // TODO: estes valores deverão vir de Settings na versão final
-    agua = rand() % 21 + 80;        // 80–100
-    nutrientes = rand() % 11 + 40;  // 40–50
+    agua = Settings::agua_inicial_solo_min +
+           rand() % (Settings::agua_inicial_solo_max - Settings::agua_inicial_solo_min + 1);
+
+    nutrientes = Settings::nutrientes_inicial_solo_min +
+                 rand() % (Settings::nutrientes_inicial_solo_max - Settings::nutrientes_inicial_solo_min + 1);
+
+    planta = nullptr;
+    ferramenta = nullptr;
 }
 
 // retorna o símbolo a imprimir no jardim
@@ -45,11 +57,7 @@ void Bloco::mostrarInfo() const {
     std::cout << "\n";
 }
 
-// atualiza o estado do bloco (planeado para meta 2)
 void Bloco::atualizar() {
-    // TODO: neste método, as plantas e ferramentas poderão agir a cada instante.
-    // Exemplo futuro:
-    // - Planta absorve água/nutrientes
-    // - Ferramenta ativa altera o bloco
-    // - Atualizar condições do solo
+    if (planta)
+        planta->atualizar(*this);
 }

@@ -3,14 +3,20 @@
 
 #include "Comando.h"
 #include "Jardim.h"
-#include <memory>  // para usar ponteiros inteligentes (opcional)
+#include "Jardineiro.h"
 
 class Simulador {
-    Jardim* jardim = nullptr;  // Ponteiro para o jardim atual (pode estar vazio)
+private:
+    Jardim* jardim;
+    int instanteAtual;
+    Jardineiro* jardineiro;
 
 public:
-    Simulador() = default;
+    Simulador(Jardim* j, Jardineiro* jard);
     ~Simulador();
+
+    int getInstanteAtual() const;
+    void avanca(int nInstantes);
 
     void processarComando(const Comando& cmd);
 };
