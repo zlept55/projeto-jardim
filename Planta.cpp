@@ -102,6 +102,11 @@ void Roseira::morrer(Bloco& b) {
     nutrientes = 0;
 }
 
+void Roseira::aposMultiplicacao() {
+    agua /= 2;          // metade da água fica na mãe
+    nutrientes = 100;   // regra do enunciado
+}
+
 void ErvaDaninha::atualizar(Bloco& b) {
     if (!viva)
         return;
@@ -145,6 +150,53 @@ void ErvaDaninha::morrer(Bloco& b) {
 /*void Planta::multiplicar() {
 
 } */
+void Carnivora::atualizar(Bloco& b) {
+    if (!viva)
+        return;
+
+    agua -= Settings::Carnivora::perda_agua;
+    nutrientes -= Settings::Carnivora::perda_nutrientes;
+
+    int aguaSolo = b.getAgua();
+    int nutrientesSolo = b.getNutrientes();
+
+    int absorcaoAgua = std::min(Settings::Carnivora::absorcao_agua,aguaSolo);
+    int absorcaoNutrientes = std::min(Settings::Carnivora::absorcao_nutrientes,nutrientesSolo);
+
+    agua += absorcaoAgua;
+    nutrientes += absorcaoNutrientes;
+
+    b.setAgua(aguaSolo - absorcaoAgua);
+    b.setNutrientes(nutrientesSolo - absorcaoNutrientes);
+
+    if (agua < Settings::Carnivora::morre_agua_menor ||
+        nutrientes < Settings::Carnivora::morre_nutrientes_menor ||
+        nutrientes > Settings::Carnivora::morre_nutrientes_maior) {
+        morrer(b);
+        return;
+    }
+
+    if (nutrientes > Settings::Carnivora::morre_nutrientes_maior)
+        pedirMult = true;
+}
+
+Planta *Carnivora::clonar() const {
+    Carnivora* k = new Carnivora();
+    k->agua = Settings::Carnivora::agua_inicial;
+    k->nutrientes = Settings::Roseira::nutrientes_inicial;
+    return k;
+}
+
+void Carnivora::morrer(Bloco &b) {
+    viva = false;
+
+    b.setAgua(b.getAgua() + agua);
+    b.setNutrientes(b.getNutrientes() + nutrientes);
+
+    agua = 0;
+    nutrientes = 0;
+}
+
 
 void Planta::mostrarInfo() const {
     std::cout << nome

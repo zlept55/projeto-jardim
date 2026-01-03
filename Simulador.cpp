@@ -27,6 +27,12 @@ void Simulador::avanca(int nInstantes) {
 
     for (int i = 0; i < nInstantes; i++) {
         instanteAtual++;
+
+        jardim->atualizar();
+
+
+
+        std::cout << "[DEBUG] Instante " << instanteAtual << " concluído\n";
         jardim->avancaInstante();   // avanço interno do jardim (plantas, etc.)
         std::cout << "[DEBUG] Instante " << instanteAtual << " concluido\n";
     }

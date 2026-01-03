@@ -27,14 +27,6 @@ Jardim::~Jardim() {
     delete[] grelha;
 }
 
-int Jardim::getLinhas() const {
-    return linhas;
-}
-
-int Jardim::getColunas() const {
-    return colunas;
-}
-
 int Jardim::getInstante() const {
     return instanteAtual;
 }
@@ -54,6 +46,41 @@ void Jardim::atualizar() {
         for (int c = 0; c < colunas; c++)
             if (grelha[l][c].getPlanta())
                 grelha[l][c].getPlanta()->atualizar(grelha[l][c]);
+
+    for (int l = 0; l < linhas; l++)
+        for (int c = 0; c < colunas; c++) {
+            Planta *p = grelha[l][c].getPlanta();
+            if (p && p->getSimbolo() == 'k') {
+                int direcoes[4][2] = {
+                    {-1, 0},
+                    { 1, 0},
+                    { 0,-1},
+                    { 0, 1}
+                };
+
+                for (int i = 0; i < 4; i++) {
+                    int vizlinha = l + direcoes[i][0];
+                    int vizcoluna = c + direcoes[i][1];
+
+                    if (vizlinha >= 0 && vizlinha < linhas
+                        && vizcoluna >= 0 && vizcoluna < colunas) {
+
+                        Bloco &vizinho = grelha[vizlinha][vizcoluna];
+                        Planta *vizPlanta = vizinho.getPlanta();
+
+                        if (vizPlanta && vizPlanta->getSimbolo() == 'e') {
+                            vizinho.setPlanta(nullptr);
+                            delete vizPlanta;
+
+                            dynamic_cast<Carnivora*>(p)->ganhaNutrientes(
+                                Settings::Carnivora::ganha_nutrientes_feia);
+
+                            std::cout << "A Planta Carnivora em (" << (char)('a'+l) << (char)('a'+c) << ") comeu erva daninha em (" << (char)('a'+vizlinha) << (char)('a'+vizcoluna) << ")!\n" << std::endl;
+                        }
+                    }
+                }
+            }
+        }
 
     tratarMultiplicacao();
     verificarEspacoRoseiras();
@@ -81,31 +108,41 @@ void Jardim::tratarMultiplicacao() {
 
             for (int dl = -1; dl <= 1; dl++) {
                 for (int dc = -1; dc <= 1; dc++) {
-                    if (dl == 0 && dc == 0) continue;
+
+                    if (dl == 0 && dc == 0)
+                        continue;
 
                     int nl = l + dl;
                     int nc = c + dc;
+
+                    if (!posicaoValida(nl, nc))
+                        continue;
+
                     if (!posicaoValida(nl, nc)) continue;
                     if (grelha[nl][nc].getPlanta()) continue;
 
-                    // Criar nova planta
-                    grelha[nl][nc].setPlanta(p->clonar());
+                    if (grelha[nl][nc].getPlanta() != nullptr)
+                        continue;
 
-                    // Ajustes específicos da roseira
-                    if (p->getSimbolo() == 'r') {
-                        p->setAgua(p->getAgua() / 2);
-                        p->setNutrientes(100);
-                    }
+                    // cria nova planta
+                    Planta* nova = p->clonar();
+                    grelha[nl][nc].setPlanta(nova);
 
+                    // ajusta a planta original (roseira, cacto, etc.)
+                    p->aposMultiplicacao();
                     p->resetMult();
-                    return;
+
+                    return; // só multiplica uma vez por instante
                 }
             }
+
+            // não conseguiu multiplicar
 
             p->resetMult();
         }
     }
 }
+
 
 void Jardim::mostrar(const Jardineiro& j) const {
     std::cout << "  ";
@@ -203,7 +240,6 @@ void Jardim::verificarEspacoRoseiras() {
         }
     }
 }
-
 // --- meta 2 ---
 
 void Jardim::adicionarPlanta(int l, int c, Planta* p) {
