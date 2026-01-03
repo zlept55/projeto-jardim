@@ -1,0 +1,8 @@
+TRABALHO PRÁTICO - JARDIM
+
+Este Trabalho Prático consiste, como no enunciado é indicado, num simulador de um Jardim de "área retangular" e que é "visto como uma grelha" - dentro do programa - tal como contem plantas e pode conter alguma ferramenta.
+
+Comecei por tratar da criação do "Jardim", abordando inicialmente cada célula individual do mesmo (Bloco):
+- Criando o respetivo ficheiro header (Bloco.h) e ficheiro source (Bloco.cpp), no ficheiro header defini/criei a classe ferramenta, planta e bloco, dentro deste temos um p0onteiro para ferramenta e para planta e as variáveis para valor dos nutrientes e água, definindo também as diferentes funções (defValoresIniciais();
+                                                                                                                                                                                                                                                                                                           getSimbolo()
+Após isso passei para o jardim (conjunto das celulas                                                                                                                                                                                                                                                                                             mostrarInfo())
