@@ -18,8 +18,11 @@ public:
     virtual ~Ferramenta() = default;
 
     // --- Métodos virtuais previstos ---
-    virtual void usar() = 0;          // TODO: ação sobre o bloco
-    virtual void mostrarInfo() const; // imprime informação da ferramenta
+    // usar(): a ação concreta sobre o solo/planta é tratada fora desta classe.
+    virtual void usar() = 0;
+
+    // Informação genérica; as derivadas podem sobrepor.
+    virtual void mostrarInfo() const;
 
     // --- Getters ---
     int getId() const { return id; }
@@ -30,29 +33,60 @@ public:
 // === Classes derivadas ===
 
 class Regador : public Ferramenta {
-    int capacidade = 200; // unidades de água
+    int capacidade; // unidades de água
 public:
-    Regador() : Ferramenta("Regador", 'g') {}
-    void usar() override { /* TODO: aumentar água no solo */ }
+    Regador()
+        : Ferramenta("Regador", 'g'),
+          capacidade(200) {} // 200 unidades como no enunciado [file:1]
+
+    void usar() override {
+        // Cada uso consome 10 unidades de água, se houver.
+        if (capacidade >= 10)
+            capacidade -= 10;
+        else
+            capacidade = 0;
+        // O efeito no solo (aumentar água) é feito pelo código que chama usar().
+    }
+
     void mostrarInfo() const override {
         std::cout << "[Regador #" << id << "] capacidade=" << capacidade << "\n";
     }
+
+    int getCapacidade() const { return capacidade; }
 };
 
 class Adubo : public Ferramenta {
-    int quantidade = 100; // unidades de nutrientes
+    int quantidade; // unidades de nutrientes
 public:
-    Adubo() : Ferramenta("Adubo", 'a') {}
-    void usar() override { /* TODO: aumentar nutrientes no solo */ }
+    Adubo()
+        : Ferramenta("Adubo", 'a'),
+          quantidade(100) {} // 100 unidades como no enunciado [file:1]
+
+    void usar() override {
+        // Cada uso consome 10 unidades de nutrientes, se houver.
+        if (quantidade >= 10)
+            quantidade -= 10;
+        else
+            quantidade = 0;
+        // O efeito no solo (aumentar nutrientes) é feito pelo código que chama usar().
+    }
+
     void mostrarInfo() const override {
         std::cout << "[Adubo #" << id << "] quantidade=" << quantidade << "\n";
     }
+
+    int getQuantidade() const { return quantidade; }
 };
 
 class Tesoura : public Ferramenta {
 public:
-    Tesoura() : Ferramenta("Tesoura", 't') {}
-    void usar() override { /* TODO: eliminar plantas feias */ }
+    Tesoura()
+        : Ferramenta("Tesoura", 't') {} // símbolo t [file:1]
+
+    void usar() override {
+        // Não se desgasta; efeito (eliminar plantas feias) é tratado fora.
+    }
+
     void mostrarInfo() const override {
         std::cout << "[Tesoura #" << id << "] ferramenta permanente\n";
     }
@@ -60,11 +94,16 @@ public:
 
 class FerramentaZ : public Ferramenta {
 public:
-    FerramentaZ() : Ferramenta("FerramentaZ", 'z') {}
-    void usar() override { /* TODO: comportamento personalizado */ }
+    FerramentaZ()
+        : Ferramenta("FerramentaZ", 'z') {} // símbolo z [file:1]
+
+    void usar() override {
+        // Comportamento especial definido pelo grupo, aplicado fora desta classe.
+    }
+
     void mostrarInfo() const override {
         std::cout << "[FerramentaZ #" << id << "] efeito especial\n";
     }
 };
 
-#endif //TP_FERRAMENTA_H
+#endif // TP_FERRAMENTA_H

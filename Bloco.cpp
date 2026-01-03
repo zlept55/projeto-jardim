@@ -1,62 +1,57 @@
 #include "Bloco.h"
 #include "Planta.h"
-#include "Settings.h"
 #include "Ferramenta.h"
-#include <iostream>
-#include <cstdlib>
+#include "Settings.h"
 
+#include <cstdlib>
 
 Bloco::Bloco() {
     defValoresIniciais();
 }
 
-// destrutor — liberta memória se existirem planta ou ferramenta
 Bloco::~Bloco() {
     delete planta;
     delete ferramenta;
 }
 
-// define valores iniciais de água e nutrientes (aleatórios)
 void Bloco::defValoresIniciais() {
     agua = Settings::agua_inicial_solo_min +
            rand() % (Settings::agua_inicial_solo_max - Settings::agua_inicial_solo_min + 1);
+    // Valores iniciais aleatórios com base no enunciado:
+    // água entre 80 e 100, nutrientes entre 40 e 50 (usando Settings ou rand). [file:1][file:42]
+    int minAgua = Settings::agua_inicial_solo_min;
+    int maxAgua = Settings::agua_inicial_solo_max;
+    int minNutr = Settings::nutrientes_inicial_solo_min;
+    int maxNutr = Settings::nutrientes_inicial_solo_max;
 
-    nutrientes = Settings::nutrientes_inicial_solo_min +
-                 rand() % (Settings::nutrientes_inicial_solo_max - Settings::nutrientes_inicial_solo_min + 1);
-
-    planta = nullptr;
-    ferramenta = nullptr;
+    agua = minAgua + (std::rand() % (maxAgua - minAgua + 1));
+    nutrientes = minNutr + (std::rand() % (maxNutr - minNutr + 1));
 }
 
-// retorna o símbolo a imprimir no jardim
 char Bloco::getSimbolo() const {
-    // ordem de prioridade de visualização:
-    // jardineiro (no futuro) > planta > ferramenta > solo
     if (planta)
         return planta->getSimbolo();
     if (ferramenta)
         return ferramenta->getSimbolo();
-    return ' '; // solo vazio
+    return ' ';
 }
 
-// mostra informação detalhada sobre o bloco
 void Bloco::mostrarInfo() const {
-    std::cout << "Água: " << agua << " | Nutrientes: " << nutrientes;
+    std::cout << "Agua: " << agua
+              << ", Nutrientes: " << nutrientes;
 
-    if (planta)
-        std::cout << " | Planta: " << "Presente";
-    else
-        std::cout << " | Planta: Nenhuma";
-
-    if (ferramenta)
-        std::cout << " | Ferramenta: " << "Presente";
-    else
-        std::cout << " | Ferramenta: Nenhuma";
+    if (planta) {
+        std::cout << ", Planta: " << planta->getSimbolo();
+    }
+    if (ferramenta) {
+        std::cout << ", Ferramenta: " << ferramenta->getSimbolo();
+    }
 
     std::cout << "\n";
 }
 
 void Bloco::atualizar() {
-    if (planta)
-        planta->atualizar(*this);
+    // Neste projeto, quem trata do comportamento das plantas é o Jardim,
+    // chamando planta->atualizar(*this) diretamente. [file:31][file:38]
+    // Mantém-se esta função para possível uso futuro.
 }

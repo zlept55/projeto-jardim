@@ -17,4 +17,5 @@ add_executable(TP main.cpp
         Settings.h
         Jardineiro.h
         Jardineiro.cpp
-        Planta.cpp)
+        Planta.cpp
+        Ferramenta.cpp)
