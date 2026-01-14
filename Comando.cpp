@@ -1,12 +1,12 @@
 #include "Comando.h"
 
 Comando::Comando(const std::string& linha) {
-    std::istringstream iss(linha);  // cria um “stream” da linha
-    iss >> nome;                    // lê a primeira palavra (nome do comando)
+    std::istringstream iss(linha); // cria um “stream” da linha
+    iss >> nome;                  // lê a primeira palavra (nome do comando)
 
     std::string temp;
     while (iss >> temp)
-        args.push_back(temp);       // lê o resto (os parâmetros)
+        args.push_back(temp);    // lê o resto (os parâmetros)
 }
 
 bool Comando::validar() {
@@ -15,9 +15,12 @@ bool Comando::validar() {
         return false;
     }
 
-    // Comandos válidos nesta fase (meta 1)
+    // Comandos válidos nesta fase
     std::vector<std::string> comandosValidos = {
-        "jardim", "avanca", "planta", "colhe", "fim"
+        "jardim", "avanca", "planta", "colhe", "fim",
+        "compra", "entra", "sai", "c", "b", "e", "d", "usa"  // novo comando para comprar ferramentas
+
+        "compra"   // novo comando para comprar ferramentas
     };
 
     bool valido = false;

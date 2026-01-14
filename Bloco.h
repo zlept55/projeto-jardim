@@ -3,21 +3,25 @@
 
 #include <iostream>
 
-class Planta; // criar class para a(s) plantas
-class Ferramenta; // criar class para a(s) ferramentas
+class Planta;     // forward declaration
+class Ferramenta; // forward declaration
 
 class Bloco {
-    Planta* planta = nullptr; // ponteiro para planta ou nullptr (caso não tenha valor)
-    Ferramenta* ferramenta = nullptr; // ponteiro para ferramenta ou nullptr (caso não tenha valor)
-    int agua; // quantidade de água no bloco atual
-    int nutrientes; // quantidade de nutrientes no bloco atual
+    Planta* planta = nullptr;        // ponteiro para planta ou nullptr
+    Ferramenta* ferramenta = nullptr; // ponteiro para ferramenta ou nullptr
+    int agua;                        // quantidade de água no bloco
+    int nutrientes;                  // quantidade de nutrientes no bloco
 
 public:
-    Bloco(int agua, int nutrientes) : agua(agua), nutrientes(nutrientes){};
+    Bloco();
+    Bloco(int agua, int nutrientes) : planta(nullptr), ferramenta(nullptr),
+                                      agua(agua), nutrientes(nutrientes) {}
     ~Bloco();
-    void defValoresIniciais(); // TODO: funcao que define os valores iniciais (aleatórios) de água e nutrientes
-    char getSimbolo() const; // função que devolve o caráter que representa a determinada célula no jardim
-    void mostrarInfo() const; // função auxiliar que imprime informação detalhada (valor da água/nutrientes)
+
+    void defValoresIniciais(); // define valores iniciais aleatórios de água/nutrientes
+
+    char getSimbolo() const;   // carácter que representa a célula no jardim
+    void mostrarInfo() const;  // imprime info detalhada (água, nutrientes, conteudo)
 
     // Getters
     Planta* getPlanta() const { return planta; }
@@ -26,14 +30,12 @@ public:
     int getNutrientes() const { return nutrientes; }
 
     // Setters
-    void setPlanta(Planta* p) { planta = p; }            // TODO: validar posição
+    void setPlanta(Planta* p) { planta = p; }
     void setFerramenta(Ferramenta* f) { ferramenta = f; }
     void setAgua(int a) { agua = a; }
     void setNutrientes(int n) { nutrientes = n; }
 
-    // TODO: comportamento futuro
-    void atualizar(); // chamada a cada instante (planta/ferramenta podem agir)
+    void atualizar(); // chamada a cada instante (planta pode agir)
 };
-
 
 #endif //TP_BLOCO_H

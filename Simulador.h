@@ -3,15 +3,31 @@
 
 #include "Comando.h"
 #include "Jardim.h"
-#include <memory>  // para usar ponteiros inteligentes (opcional)
+#include "Jardineiro.h"
+
+#include <map>
+#include <string>
 
 class Simulador {
-    Jardim* jardim = nullptr;  // Ponteiro para o jardim atual (pode estar vazio)
+
+private:
+    Jardim* jardim;
+    int instanteAtual;
+    Jardineiro* jardineiro;
+
+    // cópias de jardim associadas a um nome (para grava/recupera/apaga)
+    std::map<std::string, Jardim*> backups;
+
+    // função auxiliar para clonar um jardim (implementada em Simulador.cpp)
+    Jardim* clonarJardim(const Jardim* origem);
 
 public:
-    Simulador() = default;
+    Simulador(Jardim* j, Jardineiro* jard);
     ~Simulador();
 
+    int getInstanteAtual() const;
+
+    void avanca(int nInstantes);
     void processarComando(const Comando& cmd);
 };
 
